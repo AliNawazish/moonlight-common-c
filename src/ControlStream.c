@@ -1691,6 +1691,29 @@ bool LiGetEstimatedRttInfo(uint32_t* estimatedRtt, uint32_t* estimatedRttVarianc
     return ret;
 }
 
+
+bool LiGetEstimatedPktLossInfo(float* estimatedPktLoss, float* estimatedPktLossVariance) {
+    bool ret = false;
+
+    PltLockMutex(&enetMutex);
+    if (peer != NULL && peer->state == ENET_PEER_STATE_CONNECTED) {
+        if (estimatedPktLoss != NULL) {
+            *estimatedPktLoss = peer->packetLoss / (float) ENET_PEER_PACKET_LOSS_SCALE;
+        }
+
+        if (estimatedPktLossVariance != NULL) {
+            *estimatedPktLossVariance = peer->packetLossVariance / (float) ENET_PEER_PACKET_LOSS_SCALE;
+
+        }
+
+        ret = true;
+    }
+    PltUnlockMutex(&enetMutex);
+
+
+    return ret;
+}
+
 // Starts the control stream
 int startControlStream(void) {
     int err;
